@@ -1,94 +1,111 @@
-# 📦 Ambiente Conda: gestos
+# 📂 Documentação do Ambiente: gestos
 
-## 📋 Descrição
-Este ambiente foi configurado para tarefas de **Visão Computacional** e **Deep Learning**, utilizando **Python 3.10** e bibliotecas otimizadas para processamento de imagem, cálculos matemáticos e integração com hardware.
-
----
-
-## 🔧 Especificações do Core
-
-- **Python:** 3.10.19  
-- **Ambiente:** gestos  
-- **Localização:** `C:\Users\UMALAB\anaconda3\envs\gestos`
+Este documento detalha a configuração, instalação e uso do ambiente de desenvolvimento focado em **Visão Computacional Aplicada** e **Integração com Hardware**.
 
 ---
 
-## 📚 Bibliotecas Principais
+## 📋 Visão Geral
 
-### 👁️ Visão Computacional
-
-| Biblioteca | Versão | Função |
-|---|---|---|
-| mediapipe | 0.10.20 | Rastreamento de mãos, pose e objetos |
-| opencv-python | 4.12.0.88 | Processamento de imagem base |
-| opencv-contrib-python | 4.11.0.86 | Módulos extras como SIFT e SURF |
-
-### 🧠 Matemática e Deep Learning
-
-| Biblioteca | Versão | Função |
-|---|---|---|
-| numpy | 1.26.4 | Base numérica estável para computação científica |
-| jax | 0.6.2 | Aceleração de hardware para machine learning |
-| jaxlib | 0.6.2 | Backend computacional para JAX |
-| scipy | 1.15.3 | Algoritmos científicos avançados |
-
-### 📊 Visualização
-
-| Biblioteca | Versão | Função |
-|---|---|---|
-| matplotlib | 3.10.8 | Geração de gráficos e visualizações |
-| pillow | 12.1.0 | Manipulação básica de imagens |
-
-### 🔌 Hardware e Comunicação
-
-| Biblioteca | Versão | Função |
-|---|---|---|
-| sounddevice | 0.5.3 | Captura e processamento de áudio |
-| pyserial | 3.5 | Comunicação com Arduino e microcontroladores |
+O ambiente **gestos** foi projetado para rodar modelos de detecção de pontos de referência (*landmarks*) em tempo real via **MediaPipe**, com processamento de imagem otimizado pelo **OpenCV** e capacidade de resposta física através de protocolos **Serial**.
 
 ---
 
-## 🚀 Comandos Úteis
+## 🛠️ Configuração do Sistema
 
-### Ativar o ambiente
+### Pré‑requisitos
+
+* Anaconda ou Miniconda instalado
+* Python **3.10.19** (versão escolhida pela estabilidade com pacotes de ML)
+* Câmera funcional para testes de visão computacional
+
+---
+
+## ⚙️ Instalação Passo a Passo
+
+Para replicar o ambiente exatamente como configurado:
+
+### 1. Criação do Container
 
 ```bash
+conda create -n gestos python=3.10.19 -y
 conda activate gestos
 ```
 
-### Exportar o ambiente (backup)
+### 2. Dependências de Processamento e ML
 
 ```bash
-conda env export > gestos_environment.yml
+pip install numpy==1.26.4 scipy==1.15.3 jax==0.6.2 jaxlib==0.6.2
+```
+
+### 3. Dependências de Visão e Interface
+
+```bash
+pip install opencv-python==4.12.0.88 opencv-contrib-python==4.11.0.86 mediapipe==0.10.20
+```
+
+### 4. Hardware e Utilitários
+
+```bash
+pip install sounddevice==0.5.3 pyserial==3.5 matplotlib==3.10.8 pillow==12.1.0
 ```
 
 ---
 
-## 🤖 Integração com Hardware
+## 🏗️ Arquitetura do Código de Exemplo
 
-Como o ambiente inclui **pyserial**, ele pode ser utilizado para conectar sistemas de **visão computacional** a dispositivos físicos.
+O script de teste básico segue o fluxo clássico de um pipeline de **Visão Computacional em tempo real**:
 
-Exemplos de aplicações:
+1. **Entrada**
+   Captura de frames utilizando `cv2.VideoCapture`.
 
-- Controle de **braço robótico** via gestos
-- Acionamento de **luzes ou motores** com reconhecimento de mãos
-- Interface gestual para **robótica educacional**
+2. **Pré‑processamento**
+   Conversão de cores de **BGR → RGB**.
 
-Nesse fluxo, bibliotecas como **MediaPipe** detectam os gestos e o **PySerial** envia comandos para um **Arduino ou outro microcontrolador**.
+3. **Inferência**
+   Processamento pelo modelo `mp.solutions.hands`.
 
----
+4. **Saída de Dados**
+   Coordenadas normalizadas `(x, y, z)` dos **21 pontos da mão**.
 
-## 📁 Uso recomendado
-
-Este ambiente é adequado para projetos que envolvem:
-
-- Reconhecimento de gestos
-- Interfaces homem‑máquina (HMI)
-- Prototipagem de sistemas robóticos
-- Experimentos de visão computacional
-- Integração entre software e hardware
+5. **Ação (Opcional)**
+   Envio de comandos via `serial.Serial` para microcontroladores.
 
 ---
 
-**Ambiente mantido para desenvolvimento de visão computacional aplicada.**
+## 🚨 Notas de Manutenção (Realismo Técnico)
 
+### Conflitos de Versão
+
+O **MediaPipe** é sensível a versões do `protobuf`. Caso ocorra erro de importação, evite atualizar o pacote manualmente sem validar compatibilidade com **jax**.
+
+### Performance
+
+Para maior fluidez, mantenha:
+
+```python
+static_image_mode=False
+```
+
+Isso permite que o MediaPipe utilize **tracking entre frames**, evitando detecção completa a cada ciclo.
+
+### Comunicação Serial
+
+O `pyserial` bloqueia a porta **COM** enquanto o script está rodando.
+
+Sempre finalize o script antes de tentar enviar um novo firmware para o **Arduino**.
+
+---
+
+## 🚀 Como Executar
+
+Sempre ative o ambiente antes de rodar qualquer script:
+
+```bash
+conda activate gestos
+python seu_script.py
+```
+
+---
+
+**Ambiente mantido por:** UMALAB
+**Última atualização:** Março de 2026
